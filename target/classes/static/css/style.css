@@ -1,0 +1,79 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+}
+.container {
+  width: 100%;
+  max-width: 600px;
+  padding: 20px;
+  text-align: center;
+}
+#initial-screen {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  padding: 40px 30px;
+  color: #333;
+}
+#start-btn,
+#gemini-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 20px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-top: 20px;
+  width: 100%;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+#gemini-btn {
+  background: linear-gradient(
+    135deg,
+    #ff9966 0%,
+    #ff5e62 100%
+  ); /* Cor diferente para destaque */
+  display: none; /* Só aparece na câmera */
+}
+#camera-screen {
+  display: none;
+  position: relative;
+}
+#video {
+  width: 100%;
+  border-radius: 15px;
+  transform: scaleX(-1);
+}
+.status-indicator {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px;
+  border-radius: 20px;
+  margin-top: 10px;
+  display: inline-block;
+}
+/* Animação de pulso quando o Gemini pensa */
+.thinking {
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}

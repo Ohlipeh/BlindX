@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Assistente BlindX - IA Híbrida</title>
+
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div id="initial-screen">
+        <h1>🎯 BlindX Vision</h1>
+        <p>Assistente híbrido: Detecção rápida + Descrição detalhada.</p>
+
+        <button id="start-btn" data-som="Iniciar o assistente de visão">
+          🚀 Iniciar Assistente
+        </button>
+      </div>
+
+      <div id="camera-screen">
+        <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display: none"></canvas>
+
+        <div class="status-indicator" id="status">Carregando IA...</div>
+
+        <button id="gemini-btn" data-som="Descrever o que tem na minha frente">
+          👁️ O que tem na minha frente?
+        </button>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
+    <script type="module" src="js/script.js"></script>
+  </body>
+</html>
