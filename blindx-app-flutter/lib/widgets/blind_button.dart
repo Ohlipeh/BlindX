@@ -5,7 +5,7 @@ class BlindButton extends StatelessWidget {
   final String label;
   final String hint;
   final VoidCallback onTap;
-  final VoidCallback? onLongPress; // <--- NOVO
+  final VoidCallback? onLongPress;
   final bool isLoading;
   final Color backgroundColor;
   final Color textColor;
@@ -15,7 +15,7 @@ class BlindButton extends StatelessWidget {
     required this.label,
     required this.hint,
     required this.onTap,
-    this.onLongPress, // <--- NOVO
+    this.onLongPress,
     this.isLoading = false,
     this.backgroundColor = Colors.yellowAccent,
     this.textColor = Colors.black,
@@ -26,7 +26,7 @@ class BlindButton extends StatelessWidget {
     return Semantics(
       button: true,
       label: "$label. $hint",
-      // Adicionamos dica de acessibilidade para o toque longo
+      // Adicionando dica de acessibilidade para o toque longo
       hint:
           "Toque duas vezes para falar, ou segure para ativar o modo radar automático.",
       enabled: !isLoading,
@@ -39,7 +39,7 @@ class BlindButton extends StatelessWidget {
                   if (!isLoading) HapticFeedback.heavyImpact();
                   onTap();
                 },
-          onLongPress: isLoading ? null : onLongPress, // <--- NOVO
+          onLongPress: isLoading ? null : onLongPress,
           borderRadius: BorderRadius.circular(25),
           child: Container(
             width: double.infinity,

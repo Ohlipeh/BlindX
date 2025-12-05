@@ -2,7 +2,7 @@ import 'dart:typed_data';
 import 'package:google_generative_ai/google_generative_ai.dart';
 
 class GeminiService {
-  // ⚠️ NÃO ESQUEÇA SUA API KEY
+  // ⚠️ NÃO ESQUEÇA API KEY
   static const String _apiKey = '';
 
   late final GenerativeModel _model;

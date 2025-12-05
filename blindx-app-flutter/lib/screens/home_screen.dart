@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _initCamera() async {
-    // ... (mesmo código de antes)
     if (cameras.isEmpty) return;
     _controller = CameraController(cameras[0], ResolutionPreset.medium,
         enableAudio: false);
@@ -91,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
       onListeningEnd: () => setState(() => _statusMessage = "Processando..."),
       onResult: (command) {
         _captureAndAnalyze(command);
-        // Se o radar estava ativo antes, reiniciamos ele após a resposta (opcional)
+        // Se o radar estava ativo antes, reiniciar ele após a resposta (opcional)
         if (_isRadarActive) _toggleRadarMode();
       },
     );

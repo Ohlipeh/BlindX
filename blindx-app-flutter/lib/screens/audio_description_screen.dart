@@ -17,7 +17,7 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
     super.initState();
     // Anuncia a tela assim que ela é montada
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // CORREÇÃO: Removemos o 'context', passamos apenas o texto
+      // CORREÇÃO: Removendo o 'context', passando apenas o texto
       VoiceService.speak(
         "Tela de Audiodescrição aberta. Toque no centro para ativar.",
       );
@@ -32,7 +32,6 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
 
     // Lógica simulada de descrição de ambiente
     if (isActive) {
-      // CORREÇÃO: Apenas o texto
       VoiceService.speak(
         "Audiodescrição Ativada. À sua frente há um stand de tecnologia com três pessoas conversando. O chão é acarpetado.",
       );
@@ -44,7 +43,6 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
   // Funções auxiliares para os botões de velocidade
   void _decreaseSpeed() {
     VoiceService.speak("Diminuindo velocidade");
-    // Aqui você poderia implementar a lógica real no VoiceService se quisesse
   }
 
   void _increaseSpeed() {
