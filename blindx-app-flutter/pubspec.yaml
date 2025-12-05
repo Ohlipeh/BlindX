@@ -32,5 +32,21 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^4.0.0
 
+  # Adicionado para gerar o ícone do App
+  flutter_launcher_icons: ^0.13.1
+
 flutter:
   uses-material-design: true
+
+  # Habilita a pasta assets para usar imagens no app se precisar
+  assets:
+    - assets/
+
+# --- CONFIGURAÇÃO DO ÍCONE BLINDX ---
+flutter_launcher_icons:
+  android: "ic_launcher"
+  ios: true
+  image_path: "assets/icon.png" # Caminho da sua logo
+  min_sdk_android: 21
+  adaptive_icon_background: "#000000" # Fundo Preto (Modo Dark)
+  adaptive_icon_foreground: "assets/icon.png" # Sua logo na frente
