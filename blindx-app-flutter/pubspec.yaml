@@ -1,7 +1,6 @@
 name: blindx_app_flutter
 description: "A new Flutter project."
 publish_to: "none"
-
 version: 1.0.0+1
 
 environment:
@@ -10,34 +9,28 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # Ícones estilo iOS
   cupertino_icons: ^1.0.8
 
-  # --- PACOTES DO BLINDX ---
+  # --- PACOTES DO BLINDX (MVP VISION) ---
 
-  # 1. Voz (Falar com o usuário)
-  flutter_tts: ^3.8.5
+  # 1. Interação por Voz
+  flutter_tts: ^3.8.5 # O App fala
+  speech_to_text: ^7.0.0 # O App escuta
 
-  # 2. IA do Google (Gemini)
-  google_generative_ai: ^0.4.0
+  # 2. Inteligência Artificial
+  google_generative_ai: ^0.4.0 # Gemini Vision
 
-  # 3. Câmera (Para ver o ambiente)
+  # 3. Câmera
   camera: ^0.10.5
 
-  # 4. Utilitários de Arquivo (Necessário para salvar a foto temporária)
+  # 4. Utils
   path_provider: ^2.1.1
   path: ^1.8.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
-
-  # Para adicionar imagens/assets no futuro, descomente abaixo:
-  # assets:
-  #   - images/logo.png

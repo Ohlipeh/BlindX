@@ -1,9 +1,10 @@
+import 'dart:async'; // Importante para o Timer
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import '../main.dart';
 import '../services/gemini_service.dart';
+import '../services/voice_service.dart';
 import '../widgets/blind_button.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,75 +17,118 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   CameraController? _controller;
   final GeminiService _geminiService = GeminiService();
-  final FlutterTts _flutterTts = FlutterTts();
+
+  // Variáveis do Radar
+  Timer? _radarTimer;
+  bool _isRadarActive = false;
 
   bool _isProcessing = false;
-  String _statusMessage = "Toque para identificar";
+  String _statusMessage = "Toque para perguntar\nSegure para Radar";
 
   @override
   void initState() {
     super.initState();
     _initCamera();
-    _initTts();
+    VoiceService.init();
+    _initialWelcome();
+  }
+
+  void _initialWelcome() async {
+    await Future.delayed(const Duration(seconds: 1));
+    VoiceService.speak("Blind X pronto.");
   }
 
   Future<void> _initCamera() async {
-    if (cameras.isEmpty) {
-      setState(() => _statusMessage = "Nenhuma câmera encontrada");
-      return;
-    }
-
-    _controller = CameraController(
-      cameras[0],
-      ResolutionPreset.medium,
-      enableAudio: false,
-    );
-
+    // ... (mesmo código de antes)
+    if (cameras.isEmpty) return;
+    _controller = CameraController(cameras[0], ResolutionPreset.medium,
+        enableAudio: false);
     try {
       await _controller!.initialize();
       if (!mounted) return;
       setState(() {});
     } catch (e) {
-      _speak("Erro ao abrir a câmera");
+      debugPrint("Erro câmera: $e");
     }
   }
 
-  void _initTts() async {
-    await _flutterTts.setLanguage("pt-BR");
-    await _flutterTts.setSpeechRate(0.5);
-    _speak("Blind X Vision pronto.");
+  // --- LÓGICA DO MODO RADAR (NOVO) ---
+  void _toggleRadarMode() {
+    setState(() {
+      _isRadarActive = !_isRadarActive;
+    });
+
+    if (_isRadarActive) {
+      VoiceService.speak("Modo Radar Ativado. Caminhe devagar.");
+      // Inicia o loop a cada 6 segundos
+      _radarTimer = Timer.periodic(const Duration(seconds: 6), (timer) {
+        if (!_isProcessing &&
+            _controller != null &&
+            _controller!.value.isInitialized) {
+          // Passamos uma flag especial para o Gemini saber que é radar
+          _captureAndAnalyze("MODO_RADAR_AUTOMATICO");
+        }
+      });
+    } else {
+      VoiceService.speak("Modo Radar Parado.");
+      _radarTimer?.cancel();
+      _radarTimer = null;
+    }
   }
 
-  Future<void> _speak(String text) async {
-    await _flutterTts.speak(text);
+  // --- LÓGICA DE INTERAÇÃO MANUAL ---
+  Future<void> _startInteraction() async {
+    // Se o usuário vai falar, pausamos o radar momentaneamente para não misturar vozes
+    _radarTimer?.cancel();
+
+    if (_isProcessing) return;
+
+    HapticFeedback.heavyImpact();
+    await VoiceService.speak("Pode falar...");
+
+    await VoiceService.listen(
+      onListeningStart: () => setState(() => _statusMessage = "Ouvindo..."),
+      onListeningEnd: () => setState(() => _statusMessage = "Processando..."),
+      onResult: (command) {
+        _captureAndAnalyze(command);
+        // Se o radar estava ativo antes, reiniciamos ele após a resposta (opcional)
+        if (_isRadarActive) _toggleRadarMode();
+      },
+    );
   }
 
-  Future<void> _analyzeScene() async {
-    if (_controller == null ||
-        !_controller!.value.isInitialized ||
-        // ignore: curly_braces_in_flow_control_structures
-        _isProcessing) return;
+  Future<void> _captureAndAnalyze(String command) async {
+    if (_controller == null || !_controller!.value.isInitialized) return;
 
     setState(() {
       _isProcessing = true;
-      _statusMessage = "Analisando...";
+      // Mostra visualmente o que está acontecendo
+      _statusMessage = command == "MODO_RADAR_AUTOMATICO"
+          ? "Radar: Escaneando..."
+          : "Analisando: $command";
     });
 
-    HapticFeedback.mediumImpact();
-    _speak("Olhando...");
+    // Feedback tátil diferente para o radar (vibração leve) vs manual (vibração forte)
+    if (command == "MODO_RADAR_AUTOMATICO") {
+      HapticFeedback.lightImpact();
+    } else {
+      HapticFeedback.mediumImpact();
+    }
 
     try {
       final XFile image = await _controller!.takePicture();
       final imageBytes = await image.readAsBytes();
-      final description = await _geminiService.analyzeImage(imageBytes);
 
-      setState(() {
-        _statusMessage = description;
-      });
-      HapticFeedback.heavyImpact();
-      _speak(description);
+      final description =
+          await _geminiService.analyzeImage(imageBytes, userPrompt: command);
+
+      setState(() => _statusMessage = description);
+      await VoiceService.speak(description);
     } catch (e) {
-      _speak("Erro na análise.");
+      // No modo radar, falhas silenciosas são melhores para não irritar
+      if (command != "MODO_RADAR_AUTOMATICO") {
+        VoiceService.speak("Erro na análise.");
+      }
     } finally {
       setState(() {
         _isProcessing = false;
@@ -94,8 +138,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void dispose() {
+    _radarTimer?.cancel(); // Importante cancelar o timer ao sair
     _controller?.dispose();
-    _flutterTts.stop();
+    VoiceService.stop();
     super.dispose();
   }
 
@@ -103,9 +148,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     if (_controller == null || !_controller!.value.isInitialized) {
       return const Scaffold(
-        body: Center(
-            child: CircularProgressIndicator(color: Colors.yellowAccent)),
-      );
+          backgroundColor: Colors.black,
+          body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -113,23 +157,37 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // CÂMERA
             Expanded(
               flex: 3,
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.yellowAccent, width: 3),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(17),
-                  child: CameraPreview(_controller!),
-                ),
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                          // Borda fica VERDE se o radar estiver ligado
+                          color: _isRadarActive
+                              ? Colors.greenAccent
+                              : Colors.yellowAccent,
+                          width: 3),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(17),
+                      child: CameraPreview(_controller!),
+                    ),
+                  ),
+                  if (_isRadarActive)
+                    const Positioned(
+                      top: 30,
+                      right: 30,
+                      child: Icon(Icons.radar,
+                          color: Colors.greenAccent, size: 50),
+                    )
+                ],
               ),
             ),
-
-            // RESULTADO
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
@@ -140,20 +198,22 @@ class _HomeScreenState extends State<HomeScreen> {
                     fontWeight: FontWeight.bold),
                 textAlign: TextAlign.center,
                 maxLines: 3,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
-
             const SizedBox(height: 10),
-
-            // BOTÃO REUTILIZÁVEL (Agora usando o widget separado)
             Expanded(
               flex: 1,
               child: BlindButton(
-                label: "O QUE É ISSO?",
-                hint: "Toque duas vezes para descrever o ambiente",
+                // Muda o texto do botão dependendo do estado
+                label: _isRadarActive ? "PARAR RADAR" : "FALAR",
+                hint: "Toque para falar, segure para radar",
+                backgroundColor:
+                    _isRadarActive ? Colors.greenAccent : Colors.yellowAccent,
                 isLoading: _isProcessing,
-                onTap: _analyzeScene,
+                onTap: _isRadarActive
+                    ? _toggleRadarMode
+                    : _startInteraction, // Se radar ativo, toque simples para
+                onLongPress: _toggleRadarMode, // Segurar ativa/desativa radar
               ),
             ),
           ],

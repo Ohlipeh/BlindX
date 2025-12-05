@@ -5,7 +5,8 @@ class BlindButton extends StatelessWidget {
   final String label;
   final String hint;
   final VoidCallback onTap;
-  final bool isLoading; // Novo: Para saber se a IA está processando
+  final VoidCallback? onLongPress; // <--- NOVO
+  final bool isLoading;
   final Color backgroundColor;
   final Color textColor;
 
@@ -14,6 +15,7 @@ class BlindButton extends StatelessWidget {
     required this.label,
     required this.hint,
     required this.onTap,
+    this.onLongPress, // <--- NOVO
     this.isLoading = false,
     this.backgroundColor = Colors.yellowAccent,
     this.textColor = Colors.black,
@@ -23,7 +25,10 @@ class BlindButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: "$label. $hint", // Lê tudo junto para o TalkBack
+      label: "$label. $hint",
+      // Adicionamos dica de acessibilidade para o toque longo
+      hint:
+          "Toque duas vezes para falar, ou segure para ativar o modo radar automático.",
       enabled: !isLoading,
       child: Material(
         color: Colors.transparent,
@@ -31,16 +36,15 @@ class BlindButton extends StatelessWidget {
           onTap: isLoading
               ? null
               : () {
-                  // Feedback tátil padrão do botão
                   if (!isLoading) HapticFeedback.heavyImpact();
                   onTap();
                 },
+          onLongPress: isLoading ? null : onLongPress, // <--- NOVO
           borderRadius: BorderRadius.circular(25),
           child: Container(
             width: double.infinity,
             margin: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              // Se estiver carregando, fica cinza
               color: isLoading ? Colors.grey[800] : backgroundColor,
               borderRadius: BorderRadius.circular(25),
               border:
@@ -54,7 +58,7 @@ class BlindButton extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: textColor,
-                        fontSize: 32, // Fonte gigante
+                        fontSize: 32,
                         fontWeight: FontWeight.w900,
                       ),
                     ),

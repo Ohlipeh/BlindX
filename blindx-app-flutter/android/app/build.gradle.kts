@@ -22,10 +22,9 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.example.blindx_app_flutter"
         
-        // --- ATENÇÃO: MUDANÇA AQUI ---
-        // Alterado de flutter.minSdkVersion para 21
-        // Isso é obrigatório para usar o plugin da Câmera
-        minSdk = 21 
+        // --- CORREÇÃO AQUI ---
+        // A sintaxe correta é apenas "minSdk = 21"
+        minSdk = flutter.minSdkVersion
         
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -35,7 +34,7 @@ android {
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
-             --release` works.
+            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
     }

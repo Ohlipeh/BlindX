@@ -17,8 +17,8 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
     super.initState();
     // Anuncia a tela assim que ela é montada
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // CORREÇÃO: Removemos o 'context', passamos apenas o texto
       VoiceService.speak(
-        context,
         "Tela de Audiodescrição aberta. Toque no centro para ativar.",
       );
     });
@@ -32,13 +32,23 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
 
     // Lógica simulada de descrição de ambiente
     if (isActive) {
+      // CORREÇÃO: Apenas o texto
       VoiceService.speak(
-        context,
         "Audiodescrição Ativada. À sua frente há um stand de tecnologia com três pessoas conversando. O chão é acarpetado.",
       );
     } else {
-      VoiceService.speak(context, "Audiodescrição Pausada.");
+      VoiceService.speak("Audiodescrição Pausada.");
     }
+  }
+
+  // Funções auxiliares para os botões de velocidade
+  void _decreaseSpeed() {
+    VoiceService.speak("Diminuindo velocidade");
+    // Aqui você poderia implementar a lógica real no VoiceService se quisesse
+  }
+
+  void _increaseSpeed() {
+    VoiceService.speak("Aumentando velocidade");
   }
 
   @override
@@ -110,10 +120,7 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
                     size: 40,
                     color: Colors.black,
                   ),
-                  onPressed: () => VoiceService.speak(
-                    context,
-                    "Diminuindo velocidade da voz",
-                  ),
+                  onPressed: _decreaseSpeed,
                   tooltip: "Mais lento",
                 ),
                 const Text(
@@ -130,10 +137,7 @@ class _AudioDescriptionScreenState extends State<AudioDescriptionScreen> {
                     size: 40,
                     color: Colors.black,
                   ),
-                  onPressed: () => VoiceService.speak(
-                    context,
-                    "Aumentando velocidade da voz",
-                  ),
+                  onPressed: _increaseSpeed,
                   tooltip: "Mais rápido",
                 ),
               ],
