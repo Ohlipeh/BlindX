@@ -101,17 +101,23 @@ class _HomeScreenState extends State<HomeScreen> {
 
     setState(() {
       _isProcessing = true;
-      // Mostra visualmente o que está acontecendo
       _statusMessage = command == "MODO_RADAR_AUTOMATICO"
           ? "Radar: Escaneando..."
           : "Analisando: $command";
     });
 
-    // Feedback tátil diferente para o radar (vibração leve) vs manual (vibração forte)
+    // --- NOVO FEEDBACK SONORO (O "BIP") ---
+    // Faz o barulho de "Click" do Android (sem precisar de arquivos mp3)
+    await SystemSound.play(SystemSoundType.click);
+
     if (command == "MODO_RADAR_AUTOMATICO") {
+      // No Radar: Apenas vibração leve para não irritar
       HapticFeedback.lightImpact();
     } else {
+      // No Manual: Vibração forte + Fala para preencher o silêncio
       HapticFeedback.mediumImpact();
+      // Não usamos 'await' aqui para ele falar ENQUANTO tira a foto
+      VoiceService.speak("Processando...");
     }
 
     try {
@@ -124,7 +130,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => _statusMessage = description);
       await VoiceService.speak(description);
     } catch (e) {
-      // No modo radar, falhas silenciosas são melhores para não irritar
       if (command != "MODO_RADAR_AUTOMATICO") {
         VoiceService.speak("Erro na análise.");
       }
