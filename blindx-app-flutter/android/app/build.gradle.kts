@@ -26,7 +26,7 @@ android {
         // --- ATENÇÃO: MUDANÇA AQUI ---
         // Alterado de flutter.minSdkVersion para 21
         // Isso é obrigatório para usar o plugin da Câmera
-        minSdk = flutter.minSdkVersion 
+        minSdk = 21 
         
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

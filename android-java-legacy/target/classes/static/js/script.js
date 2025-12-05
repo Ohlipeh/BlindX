@@ -1,3 +1,4 @@
+<<<<<<< HEAD:android-java-legacy/src/main/resources/static/js/script.js
 import { GoogleGenerativeAI } from "https://esm.run/@google/generative-ai";
 
 // ⚠️ API KEY AQUI
@@ -5,6 +6,11 @@ const API_KEY = "AIzaSyBsM0lNCjy_Yx4bY-Vnzhd3y9tbVgt-9Lc";
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 const modelGemini = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+=======
+// ==========================================
+// BlindX - Frontend Seguro (API Key no Backend)
+// ==========================================
+>>>>>>> 7fc66067e6e5702486a9038e80bbed6ac42dcc9f:src/main/resources/static/js/script.js
 
 // ==========================================
 // VARIÁVEIS GLOBAIS
@@ -107,7 +113,7 @@ function startRealTimeDetection() {
 }
 
 // ==========================================
-// AÇÃO 2: GEMINI (DESCRIÇÃO)
+// AÇÃO 2: GEMINI (DESCRIÇÃO) - VIA BACKEND SEGURO
 // ==========================================
 geminiBtn.addEventListener("click", async () => {
   if (isGeminiThinking) return;
@@ -118,24 +124,28 @@ geminiBtn.addEventListener("click", async () => {
 
   try {
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const base64Image = canvas.toDataURL("image/jpeg").split(",")[1];
+    const base64Image = canvas.toDataURL("image/jpeg");
 
-    const prompt =
-      "Descreva esta cena para uma pessoa cega. Seja breve. Responda em português.";
+    // Chama o backend seguro ao invés de chamar a API diretamente
+    const response = await fetch("/api/describe", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ image: base64Image }),
+    });
 
-    const result = await modelGemini.generateContent([
-      prompt,
-      { inlineData: { data: base64Image, mimeType: "image/jpeg" } },
-    ]);
+    const data = await response.json();
 
-    const response = await result.response;
-    const text = response.text();
-
-    console.log(text);
-    speak(text);
+    if (data.error) {
+      speak("Erro: " + data.error);
+    } else {
+      console.log(data.description);
+      speak(data.description);
+    }
   } catch (error) {
     console.error(error);
-    speak("Erro ao conectar.");
+    speak("Erro ao conectar com o servidor.");
   } finally {
     isGeminiThinking = false;
     geminiBtn.innerText = "👁️ O que tem na minha frente?";

@@ -4,7 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart';
 class GeminiService {
   // ⚠️ GERE SUA CHAVE EM: https://aistudio.google.com/app/apikey
   // E COLE ABAIXO DENTRO DAS ASPAS:
-  static const String _apiKey = 'AIzaSyBRZwnHzPnCt_l2xGbdQPWT5wR7QKqab1c';
+  static const String _apiKey = 'AIzaSyBsM0lNCjy_Yx4bY-Vnzhd3y9tbVgt-9Lc';
 
   late final GenerativeModel _model;
 
