@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 /// Serviço responsável por gerenciar o feedback de voz e tátil do aplicativo.
-/// Em um app real, aqui seria integrado o pacote 'flutter_tts'.
 class VoiceService {
   /// Executa o comando de falar e vibrar o dispositivo.
   ///

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../main.dart';
 import '../services/gemini_service.dart';
-import '../widgets/blind_button.dart'; // <--- Importamos o botão aqui
+import '../widgets/blind_button.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
