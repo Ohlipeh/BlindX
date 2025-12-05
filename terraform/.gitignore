@@ -1,0 +1,9 @@
+# Arquivos do Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# Chave privada gerada
+*.pem
